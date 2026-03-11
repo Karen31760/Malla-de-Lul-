@@ -401,18 +401,41 @@ el.innerHTML=`
 </div>`;
 
 if(status==='locked'){
-el.dataset.tip='Falta Aprobar: '+missing(s).join(', ');
-el.addEventListener('mousemove',e=>{
-tooltip.textContent=el.dataset.tip;
-tooltip.classList.add('show');
-tooltip.style.left=e.pageX+15+'px';
-tooltip.style.top=e.pageY+15+'px';
-});
-el.addEventListener('mouseleave',()=>tooltip.classList.remove('show'));
+  el.dataset.tip='Falta Aprobar: '+missing(s).join(', ');
+
+  el.addEventListener('mouseenter',e=>{
+    tooltip.textContent=el.dataset.tip;
+    tooltip.classList.add('show');
+    moveTooltip(e);
+  });
+
+  el.addEventListener('mousemove',moveTooltip);
+  el.addEventListener('mouseleave',()=>tooltip.classList.remove('show'));
 }
 
 el.onclick=()=>toggle(s.id);
 return el;
+}
+
+function moveTooltip(e){
+const offset=16;
+const rect=tooltip.getBoundingClientRect();
+let left=e.clientX + offset;
+let top=e.clientY + offset;
+
+if(left + rect.width > window.innerWidth - 12){
+  left = window.innerWidth - rect.width - 12;
+}
+
+if(top + rect.height > window.innerHeight - 12){
+  top = e.clientY - rect.height - offset;
+}
+
+if(top < 12) top = 12;
+if(left < 12) left = 12;
+
+tooltip.style.left = `${left}px`;
+tooltip.style.top = `${top}px`;
 }
 
 function render(){
