@@ -203,7 +203,7 @@ color:#b85c8c;
 }
 
 .tooltip{
-position:fixed;
+position:absolute;
 background:#5c3648;
 color:white;
 padding:8px 12px;
@@ -212,9 +212,10 @@ border-radius:10px;
 pointer-events:none;
 opacity:0;
 transition:.1s;
-z-index:100;
+z-index:9999;
 max-width:280px;
 line-height:1.4;
+box-shadow:0 10px 24px rgba(92,54,72,.25);
 }
 
 .tooltip.show{opacity:1}
@@ -419,12 +420,31 @@ return el;
 
 function moveTooltip(e){
 const offset=16;
-const rect=tooltip.getBoundingClientRect();
-let left=e.clientX + offset;
-let top=e.clientY + offset;
+const scrollX=window.scrollX;
+const scrollY=window.scrollY;
 
-if(left + rect.width > window.innerWidth - 12){
-  left = window.innerWidth - rect.width - 12;
+const tooltipWidth=tooltip.offsetWidth;
+const tooltipHeight=tooltip.offsetHeight;
+
+let left=e.pageX + offset;
+let top=e.pageY + offset;
+
+const maxLeft=scrollX + window.innerWidth - tooltipWidth - 12;
+const maxTop=scrollY + window.innerHeight - tooltipHeight - 12;
+
+if(left > maxLeft){
+  left = maxLeft;
+}
+
+if(top > maxTop){
+  top = e.pageY - tooltipHeight - offset;
+}
+
+if(top < scrollY + 12) top = scrollY + 12;
+if(left < scrollX + 12) left = scrollX + 12;
+
+tooltip.style.left = `${left}px`;
+tooltip.style.top = `${top}px`;
 }
 
 if(top + rect.height > window.innerHeight - 12){
